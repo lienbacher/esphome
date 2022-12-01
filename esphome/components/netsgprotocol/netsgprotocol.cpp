@@ -65,9 +65,11 @@ void NetSGProtocolComponent::update() {
     while (available()) {
       if (read() == MAGIC_BYTE && read() == CMD_STATUS) {
         ESP_LOGI(TAG, "Status header received");
-        static uint8_t buffer[26];
+        static uint8_t buffer[27];
 
-        read_array(buffer, 26);
+        if (!read_array(buffer, 27)) {
+          ESP_LOGE(TAG, "failed to read buffer of size 27");
+        }
 
         uint32_t deviceID = buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | (buffer[9] & 0xFF);
 
