@@ -122,7 +122,7 @@ void NetSGProtocolComponent::update() {
         ESP_LOGI(TAG,
                  "dcVoltage: %f, dcCurrent: %f, dcPower: %f, acVoltage: %f, acCurrent: %f, acPower: %f, temperature: "
                  "%d, totalPower: %f",
-                 dcVoltage, dcCurrent, (dcVoltage * dcCurrent), acVoltage, acCurrent, (acVoltage * acCurrent),
+                 dcVoltage, dcCurrent, (dcVoltage * dcCurrent), acVoltage, acCurrent, (acVoltage * acCurrent / 2.66),
                  temperature, totalPower);
         ESP_LOGI(TAG, "CRC %s\n", valid ? "valid" : "invalid");
 
