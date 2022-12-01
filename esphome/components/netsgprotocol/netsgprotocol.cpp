@@ -107,7 +107,7 @@ void NetSGProtocolComponent::update() {
         }
 
         if (this->ac_power_sensor_ != nullptr) {
-          this->ac_power_sensor_->publish_state(acVoltage * acCurrent);
+          this->ac_power_sensor_->publish_state(acVoltage * acCurrent / 2.66);
         }
 
         uint8_t state = buffer[25];        // not fully reversed
