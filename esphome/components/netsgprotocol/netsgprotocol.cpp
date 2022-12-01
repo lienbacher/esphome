@@ -63,13 +63,15 @@ void NetSGProtocolComponent::update() {
   const uint32_t startTime = millis();
   while (millis() - startTime < 1000) {
     while (available()) {
-      if (read() == MAGIC_BYTE && read() == CMD_STATUS) {
-        ESP_LOGI(TAG, "Status header received");
-        static uint8_t buffer[27];
+      static uint8_t buffer[27];
 
-        if (!read_array(buffer, 27)) {
-          ESP_LOGE(TAG, "failed to read buffer of size 27");
-        }
+      if (!read_array(buffer, 27)) {
+        ESP_LOGE(TAG, "failed to read buffer of size 27");
+        return;
+      }
+
+      if (buffer[0] == MAGIC_BYTE && buffer[1] == CMD_STATUS) {
+        ESP_LOGI(TAG, "Status header received");
 
         uint32_t deviceID = buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | (buffer[9] & 0xFF);
 
