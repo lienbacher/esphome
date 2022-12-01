@@ -119,6 +119,11 @@ void NetSGProtocolComponent::update() {
 
         uint8_t valid = buffer[14] == calcCRC(14);
 
+        ESP_LOGI(TAG,
+                 "dcVoltage: %f, dcCurrent: %f, dcPower: %f, acVoltage: %f, acCurrent: %f, acPower: %f, temperature: "
+                 "%d, totalPower: %f",
+                 dcVoltage, dcCurrent, (dcVoltage * dcCurrent), acVoltage, acCurrent, (acVoltage * acCurrent),
+                 temperature, totalPower);
         ESP_LOGI(TAG, "CRC %s\n", valid ? "valid" : "invalid");
 
         if (valid)
