@@ -67,13 +67,13 @@ async def to_code(config):
         cg.add(netsgprotocol_component.set_dc_power_sensor(sens))
     if CONF_AC_VOLTAGE in config:
         sens = await sensor.new_sensor(config[CONF_AC_VOLTAGE])
-        cg.add(netsgprotocol_component.set_dc_voltage_sensor(sens))
+        cg.add(netsgprotocol_component.set_ac_voltage_sensor(sens))
     if CONF_AC_CURRENT in config:
         sens = await sensor.new_sensor(config[CONF_AC_CURRENT])
-        cg.add(netsgprotocol_component.set_dc_current_sensor(sens))
+        cg.add(netsgprotocol_component.set_ac_current_sensor(sens))
     if CONF_AC_POWER in config:
         sens = await sensor.new_sensor(config[CONF_AC_POWER])
-        cg.add(netsgprotocol_component.set_dc_power_sensor(sens))
+        cg.add(netsgprotocol_component.set_ac_power_sensor(sens))
     if CONF_POWER_GEN_TOTAL in config:
         sens = await sensor.new_sensor(config[CONF_POWER_GEN_TOTAL])
         cg.add(netsgprotocol_component.set_power_gen_total_sensor(sens))
