@@ -117,7 +117,11 @@ void NetSGProtocolComponent::update() {
           this->device_temperature_sensor_->publish_state(temperature);
         }
 
-        uint8_t valid = buffer[14] == calcCRC(14);
+        uint8_t crc = 0;
+        for (size_t i = 0; i < 14; ++i) {
+          crc += buffer[i];
+        }
+        uint8_t valid = buffer[14] == crc;
 
         ESP_LOGI(TAG,
                  "dcVoltage: %f, dcCurrent: %f, dcPower: %f, acVoltage: %f, acCurrent: %f, acPower: %f, temperature: "
