@@ -3,7 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import uart
 from esphome.components import switch
 from esphome.const import CONF_ID
-from esphome import automation
+from esphome import pins, automation
 from esphome.automation import maybe_simple_id
 
 DEPENDENCIES = ["uart"]
@@ -22,6 +22,7 @@ CONF_NetSGProtocol_ID = "netsgprotocol_id"
 CONF_INVERTER_DEVICE_ID = "inverter_device_id"
 CONF_POLL_INTERVAL = "poll_interval"
 CONF_POWER_GRADE = "power_grade"
+CONF_SET_PIN = "set_pin"
 CONF_ON_OFF_SWITCH = "on_off_switch"
 
 CONFIG_SCHEMA = cv.All(
@@ -31,6 +32,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Required(CONF_INVERTER_DEVICE_ID): cv.int_range(min=1, max=4294967295),
             cv.Optional(CONF_POLL_INTERVAL, default=1): cv.int_range(min=1, max=3600),
             cv.Optional(CONF_POWER_GRADE, default=100): cv.int_range(min=1, max=100),
+            cv.Optional(CONF_SET_PIN): pins.internal_gpio_output_pin_schema,
             cv.Optional(CONF_ON_OFF_SWITCH): cv.ensure_list(
                 switch.switch_schema(switch.Switch)
             ),
@@ -54,6 +56,8 @@ async def to_code(config):
     cg.add(var.set_inverter_device_id(config[CONF_INVERTER_DEVICE_ID]))
     cg.add(var.set_poll_interval(config[CONF_POLL_INTERVAL]))
     cg.add(var.set_power_grade(config[CONF_POWER_GRADE]))
+    set_pin = await cg.gpio_pin_expression(config[CONF_SET_PIN])
+    cg.add(var.set_set_pin(set_pin))
 
 
 CALIBRATION_ACTION_SCHEMA = maybe_simple_id(

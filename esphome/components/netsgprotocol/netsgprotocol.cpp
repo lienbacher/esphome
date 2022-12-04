@@ -9,6 +9,8 @@ namespace netsgprotocol {
 static const char *const TAG = "netsgprotocol";
 
 void NetSGProtocolComponent::setup() {
+  ESP_LOGI(TAG, "NET SG Protocol Setting up");
+
   if (poll_interval > 0)
     set_update_interval(poll_interval * 1000);
   else {
@@ -16,7 +18,73 @@ void NetSGProtocolComponent::setup() {
     ESP_LOGW(TAG, "poll interval not properly configured, defaulting to 1 second");
   }
 
-  ESP_LOGI(TAG, "NET SG Protocol Setting up");
+  if (set_pin_ != nullptr) {
+    ESP_LOGI(TAG, "set pin is configured,reading configuration from Radio");
+
+    uint8_t *bufferPointer = &mBuffer[0];
+
+    *bufferPointer++ = 0xAA;  // command byte
+    *bufferPointer++ = 0x5C;  // command byte
+    *bufferPointer++ = 0x00;  // module identifier
+    *bufferPointer++ = 0x00;  // module identifier
+    *bufferPointer++ = 0x00;  // networking identifier
+    *bufferPointer++ = 0x00;  // networking identifier
+    *bufferPointer++ = 0x00;  // NC must be 0
+    *bufferPointer++ = 0x00;  // RF power
+    *bufferPointer++ = 0x00;  // NC must be 0
+    *bufferPointer++ = 0x00;  // Baudrate
+    *bufferPointer++ = 0x00;  // NC must be 0
+    *bufferPointer++ = 0x00;  // RF channel (0 - 127)
+    *bufferPointer++ = 0x00;  // NC must be 0
+    *bufferPointer++ = 0x00;  // NC must be 0
+    *bufferPointer++ = 0x00;  // NC must be 0
+    *bufferPointer++ = 0x12;  // Length
+    *bufferPointer++ = 0x00;  // NC must be 0
+    *bufferPointer++ = 0x18;  // Checksum
+
+    set_pin_->pin_mode(gpio::FLAG_OUTPUT);
+    set_pin_->setup();
+
+    // enable programming mode
+    set_pin_->digital_write(false);
+    delayMicroseconds(1000);
+
+    this->write_array(mBuffer, 18);
+
+    const uint32_t startTime = millis();
+    while (millis() - startTime < 1000) {
+      while (available()) {
+        static uint8_t buffer[18];
+
+        if (read_array(buffer, 18)) {
+          if (mBuffer[0] == 0xAA && mBuffer[1] == 0x5D && mBuffer[17] == calcCRC(17)) {
+            uint16_t moduleID = mBuffer[2] << 8 | (mBuffer[3] & 0xFF);   /// Unique module identifier
+            uint16_t networkID = mBuffer[4] << 8 | (mBuffer[5] & 0xFF);  /// Network identifier
+            uint8_t rfPower = mBuffer[7];                                /// RF power
+            uint8_t baudrate = mBuffer[9];                               /// Baudrate
+            uint8_t rfChannel = mBuffer[11];                             /// RF channel
+
+            ESP_LOGI(TAG,
+                     "LC12S Radio configured: \n\tmoduleID: %04X\n\tnetworkID: %04X\n\t"
+                     "rfPower: %d\n\tbaudrate: %d\n\trfChannel: %02X",
+                     moduleID, networkID, rfPower, baudrate, rfChannel);
+
+            set_pin_->digital_write(true);
+            return;
+          }
+        } else {
+          ESP_LOGE(TAG, "reading radio configuration bytes failed!");
+          set_pin_->digital_write(true);
+          return;
+        }
+      }  // while(available())
+    }    // check timeout
+
+    ESP_LOGW(TAG, "reading radio configuration timed out");
+
+    // disable programming mode of radio
+    set_pin_->digital_write(true);
+  }
 }
 
 void NetSGProtocolComponent::dump_config() {

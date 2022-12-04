@@ -38,6 +38,7 @@ class NetSGProtocolComponent : public PollingComponent, public uart::UARTDevice 
   void set_inverter_device_id(int value) { this->inverter_device_id = value; };
   void set_poll_interval(int value) { this->poll_interval = value; };
   void set_power_grade(int value) { this->power_grade = value; };
+  void set_set_pin(GPIOPin *set_pin) { this->set_pin_ = set_pin; };
 
   int32_t last_periodic_millis = millis();
 
@@ -50,6 +51,7 @@ class NetSGProtocolComponent : public PollingComponent, public uart::UARTDevice 
   sensor::Sensor *ac_power_sensor_{nullptr};
   sensor::Sensor *power_gen_total_sensor_{nullptr};
   sensor::Sensor *device_temperature_sensor_{nullptr};
+  GPIOPin *set_pin_{nullptr};
 
   void send_command_(uint8_t command, uint8_t value = 0x00);
 
