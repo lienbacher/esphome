@@ -150,40 +150,8 @@ void NetSGProtocolComponent::update() {
         float acVoltage = (buffer[19] << 8 | buffer[20]) / 100.0f;
         float acCurrent = (buffer[21] << 8 | buffer[22]) / 100.0f;
 
-        if (this->power_gen_total_sensor_ != nullptr) {
-          this->power_gen_total_sensor_->publish_state(totalPower);
-        }
-
-        if (this->dc_voltage_sensor_ != nullptr) {
-          this->dc_voltage_sensor_->publish_state(dcVoltage);
-        }
-
-        if (this->dc_current_sensor_ != nullptr) {
-          this->dc_current_sensor_->publish_state(dcCurrent);
-        }
-
-        if (this->dc_power_sensor_ != nullptr) {
-          this->dc_power_sensor_->publish_state(dcVoltage * dcCurrent);
-        }
-
-        if (this->ac_voltage_sensor_ != nullptr) {
-          this->ac_voltage_sensor_->publish_state(acVoltage);
-        }
-
-        if (this->ac_current_sensor_ != nullptr) {
-          this->ac_current_sensor_->publish_state(acCurrent);
-        }
-
-        if (this->ac_power_sensor_ != nullptr) {
-          this->ac_power_sensor_->publish_state(acVoltage * acCurrent / 2.66);
-        }
-
         uint8_t state = buffer[25];        // not fully reversed
         uint8_t temperature = buffer[26];  // not fully reversed
-
-        if (this->device_temperature_sensor_ != nullptr) {
-          this->device_temperature_sensor_->publish_state(temperature);
-        }
 
         uint8_t crc = 0;
         for (size_t i = 0; i < 14; ++i) {
@@ -191,11 +159,45 @@ void NetSGProtocolComponent::update() {
         }
         uint8_t valid = buffer[14] == crc;
 
+        if (valid > 0) {
+          if (this->power_gen_total_sensor_ != nullptr) {
+            this->power_gen_total_sensor_->publish_state(totalPower);
+          }
+
+          if (this->dc_voltage_sensor_ != nullptr) {
+            this->dc_voltage_sensor_->publish_state(dcVoltage);
+          }
+
+          if (this->dc_current_sensor_ != nullptr) {
+            this->dc_current_sensor_->publish_state(dcCurrent);
+          }
+
+          if (this->dc_power_sensor_ != nullptr) {
+            this->dc_power_sensor_->publish_state(dcVoltage * dcCurrent);
+          }
+
+          if (this->ac_voltage_sensor_ != nullptr) {
+            this->ac_voltage_sensor_->publish_state(acVoltage);
+          }
+
+          if (this->ac_current_sensor_ != nullptr) {
+            this->ac_current_sensor_->publish_state(acCurrent);
+          }
+
+          if (this->ac_power_sensor_ != nullptr) {
+            this->ac_power_sensor_->publish_state(acVoltage * acCurrent / 2.66);
+          }
+
+          if (this->device_temperature_sensor_ != nullptr) {
+            this->device_temperature_sensor_->publish_state(temperature);
+          }
+        }
+
         ESP_LOGI(TAG,
                  "dcVoltage: %f, dcCurrent: %f, dcPower: %f, acVoltage: %f, acCurrent: %f, acPower: %f, temperature: "
-                 "%d, totalPower: %f",
+                 "%d, totalPower: %f, state: %x",
                  dcVoltage, dcCurrent, (dcVoltage * dcCurrent), acVoltage, acCurrent, (acVoltage * acCurrent / 2.66),
-                 temperature, totalPower);
+                 temperature, totalPower, state);
         ESP_LOGI(TAG, "CRC %s\n", valid ? "valid" : "invalid");
 
         if (valid)
