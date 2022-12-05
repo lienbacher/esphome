@@ -131,6 +131,8 @@ void NetSGProtocolComponent::update() {
   const uint32_t startTime = millis();
   while (millis() - startTime < 1000) {
     while (available()) {
+      ESP_LOGI(TAG, "%d bytes available()", available());
+
       static uint8_t buffer[27];
 
       if (!read_array(buffer, 27)) {
