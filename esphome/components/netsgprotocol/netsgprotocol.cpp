@@ -130,8 +130,8 @@ void NetSGProtocolComponent::update() {
 
   const uint32_t startTime = millis();
   while (millis() - startTime < 1000) {
-    while (available()) {
-      ESP_LOGI(TAG, "%d bytes available()", available());
+    if (available() >= 27) {
+      ESP_LOGI(TAG, "Entering: %d bytes available()", available());
 
       static uint8_t buffer[27];
 
@@ -205,6 +205,8 @@ void NetSGProtocolComponent::update() {
         if (valid)
           return;
       }
+    } else {
+      ESP_LOGI(TAG, "%d bytes available()", available());
     }
   }
 
