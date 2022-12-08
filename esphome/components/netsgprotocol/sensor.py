@@ -22,8 +22,8 @@ CONF_DC_POWER = "dc_power"
 CONF_AC_VOLTAGE = "ac_voltage"
 CONF_AC_CURRENT = "ac_current"
 CONF_AC_POWER = "ac_power"
-CONF_POWER_GEN_TOTAL = "conf_power_gen_total"
-CONF_DEVICE_TEMPERATURE = "conf_device_temperature"
+CONF_POWER_GEN_TOTAL = "power_gen_total"
+CONF_DEVICE_TEMPERATURE = "device_temperature"
 
 CONFIG_SCHEMA = {
     cv.GenerateID(CONF_NetSGProtocol_ID): cv.use_id(NetSGProtocolComponent),
