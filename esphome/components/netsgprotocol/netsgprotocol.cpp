@@ -148,7 +148,7 @@ void NetSGProtocolComponent::update() {
         const uint32_t tempTotal = buffer[10] << 24 | buffer[11] << 16 | buffer[12] << 8 | (buffer[13] & 0xFF);
         float totalPower = (float) tempTotal;
         float dcVoltage = (buffer[15] << 8 | buffer[16]) / 100.0f;
-        float dcCurrent = (buffer[17] << 8 | buffer[18]) / 100.0f / 2.66;
+        float dcCurrent = (buffer[17] << 8 | buffer[18]) / 100.0f;
         float acVoltage = (buffer[19] << 8 | buffer[20]) / 100.0f;
         float acCurrent = (buffer[21] << 8 | buffer[22]) / 100.0f;
 
@@ -187,7 +187,7 @@ void NetSGProtocolComponent::update() {
           }
 
           if (this->ac_power_sensor_ != nullptr) {
-            this->ac_power_sensor_->publish_state(acVoltage * acCurrent / 2.66);
+            this->ac_power_sensor_->publish_state(acVoltage * acCurrent);
           }
 
           if (this->device_temperature_sensor_ != nullptr) {
@@ -198,7 +198,7 @@ void NetSGProtocolComponent::update() {
         ESP_LOGI(TAG,
                  "dcVoltage: %f, dcCurrent: %f, dcPower: %f, acVoltage: %f, acCurrent: %f, acPower: %f, temperature: "
                  "%d, totalPower: %f, state: %x",
-                 dcVoltage, dcCurrent, (dcVoltage * dcCurrent), acVoltage, acCurrent, (acVoltage * acCurrent / 2.66),
+                 dcVoltage, dcCurrent, (dcVoltage * dcCurrent), acVoltage, acCurrent, (acVoltage * acCurrent),
                  temperature, totalPower, state);
         ESP_LOGI(TAG, "CRC %s\n", valid ? "valid" : "invalid");
 
